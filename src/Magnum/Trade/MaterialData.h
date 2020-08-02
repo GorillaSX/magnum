@@ -142,80 +142,98 @@ enum class MaterialAttribute: UnsignedInt {
     AmbientCoordinateSet,
 
     /**
-     * Diffuse color for Phong materials, @ref MaterialAttributeType::Vector4.
+     * Diffuse color for Phong or PBR specular/glossiness materials,
+     * @ref MaterialAttributeType::Vector4.
      *
      * If @ref MaterialAttribute::DiffuseTexture is present as well, these two
      * are multiplied together.
-     * @see @ref PhongMaterialData::diffuseColor()
+     * @see @ref PhongMaterialData::diffuseColor(),
+     *      @ref PbrSpecularGlossinessMaterialData::diffuseColor()
      */
     DiffuseColor,
 
     /**
-     * Diffuse texture index for Phong materials,
+     * Diffuse texture index for Phong or PBR specular/glossiness materials,
      * @ref MaterialAttributeType::UnsignedInt.
      *
      * If @ref MaterialAttribute::DiffuseColor is present as well, these two
      * are multiplied together.
-     * @see @ref PhongMaterialData::diffuseTexture()
+     * @see @ref PhongMaterialData::diffuseTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::diffuseTexture()
      */
     DiffuseTexture,
 
     /**
-     * Diffuse texture transformation matrix for Phong materials,
-     * @ref MaterialAttributeType::Matrix3x3.
+     * Diffuse texture transformation matrix for Phong or PBR
+     * specular/glossiness materials, @ref MaterialAttributeType::Matrix3x3.
      *
      * Has a precedence over @ref MaterialAttribute::TextureMatrix if both are
      * present.
-     * @see @ref PhongMaterialData::diffuseTextureMatrix()
+     * @see @ref PhongMaterialData::diffuseTextureMatrix(),
+     *      @ref PbrSpecularGlossinessMaterialData::diffuseTextureMatrix()
      */
     DiffuseTextureMatrix,
 
     /**
-     * Diffuse texture coordinate set index for Phong materials,
-     * @ref MaterialAttributeType::UnsignedInt.
+     * Diffuse texture coordinate set index for Phong or PBR
+     * specular/glossiness materials, @ref MaterialAttributeType::UnsignedInt.
      *
      * Has a precedence over @ref MaterialAttribute::CoordinateSet if both are
      * present.
-     * @see @ref PhongMaterialData::diffuseCoordinateSet()
+     * @see @ref PhongMaterialData::diffuseCoordinateSet(),
+     *      @ref PbrSpecularGlossinessMaterialData::diffuseCoordinateSet()
      */
     DiffuseCoordinateSet,
 
     /**
-     * Specular color for Phong materials, @ref MaterialAttributeType::Vector4.
+     * Specular color for Phong or PBR specular/glossiness materials,
+     * @ref MaterialAttributeType::Vector4.
      *
-     * If @ref MaterialAttribute::SpecularTexture is present as well, these two
-     * are multiplied together.
-     * @see @ref PhongMaterialData::specularColor()
+     * If @ref MaterialAttribute::SpecularTexture or
+     * @ref MaterialAttribute::SpecularGlossinessTexture is present as well,
+     * these two are multiplied together.
+     * @see @ref PhongMaterialData::specularColor(),
+     *      @ref PbrSpecularGlossinessMaterialData::specularColor()
      */
     SpecularColor,
 
     /**
-     * Specular texture index for Phong materials,
+     * Specular texture index for Phong or PBR specular/glossiness materials,
      * @ref MaterialAttributeType::UnsignedInt.
      *
      * If @ref MaterialAttribute::SpecularColor is present as well, these two
-     * are multiplied together.
-     * @see @ref PhongMaterialData::specularTexture()
+     * are multiplied together. Can be alternatively supplied as a packed
+     * @ref MaterialAttribute::SpecularGlossinessTexture.
+     * @see @ref PhongMaterialData::hasSpecularTexture(),
+     *      @ref PhongMaterialData::specularTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::hasSpecularTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::hasSpecularGlossinessTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::specularTexture()
      */
     SpecularTexture,
 
+    /** @todo SpecularTextureSwizzle? It's a color and existing packing schemes
+        always have it as RGB, so probably safe to assume it's always RGB */
+
     /**
-     * Specular texture transformation matrix for Phong materials,
-     * @ref MaterialAttributeType::Matrix3x3.
+     * Specular texture transformation matrix for Phong or PBR
+     * specular/glossiness materials, @ref MaterialAttributeType::Matrix3x3.
      *
      * Has a precedence over @ref MaterialAttribute::TextureMatrix if both are
      * present.
-     * @see @ref PhongMaterialData::specularTextureMatrix()
+     * @see @ref PhongMaterialData::specularTextureMatrix(),
+     *      @ref PbrSpecularGlossinessMaterialData::glossinessTextureMatrix()
      */
     SpecularTextureMatrix,
 
     /**
-     * Specular texture coordinate set index for Phong materials,
-     * @ref MaterialAttributeType::UnsignedInt.
+     * Specular texture coordinate set index for Phong or PBR
+     * specular/glossiness materials, @ref MaterialAttributeType::UnsignedInt.
      *
      * Has a precedence over @ref MaterialAttribute::CoordinateSet if both are
      * present.
-     * @see @ref PhongMaterialData::specularCoordinateSet()
+     * @see @ref PhongMaterialData::specularCoordinateSet(),
+     *      @ref PbrSpecularGlossinessMaterialData::glossinessCoordinateSet()
      */
     SpecularCoordinateSet,
 
@@ -227,11 +245,346 @@ enum class MaterialAttribute: UnsignedInt {
     Shininess,
 
     /**
+     * Base color for PBR metallic/roughness materials,
+     * @ref MaterialAttributeType::Vector4.
+     *
+     * If @ref MaterialAttribute::BaseColorTexture is present as well, these
+     * two are multiplied together.
+     * @see @ref PbrMetallicRoughnessMaterialData::baseColor()
+     */
+    BaseColor,
+
+    /**
+     * Base color texture index for PBR metallic/roughness materials,
+     * @ref MaterialAttributeType::UnsignedInt.
+     *
+     * If @ref MaterialAttribute::BaseColor is present as well, these two are
+     * multiplied together.
+     * @see @ref PbrMetallicRoughnessMaterialData::baseColorTexture()
+     */
+    BaseColorTexture,
+
+    /**
+     * Base color texture transformation matrix for PBR metallic/roughness
+     * materials, @ref MaterialAttributeType::Matrix3x3.
+     *
+     * Has a precedence over @ref MaterialAttribute::TextureMatrix if both are
+     * present.
+     * @see @ref PbrMetallicRoughnessMaterialData::baseColorTextureMatrix()
+     */
+    BaseColorTextureMatrix,
+
+    /**
+     * Base color texture coordinate set index for PBR metallic/roughness
+     * materials, @ref MaterialAttributeType::UnsignedInt.
+     *
+     * Has a precedence over @ref MaterialAttribute::CoordinateSet if both are
+     * present.
+     * @see @ref PbrMetallicRoughnessMaterialData::baseColorCoordinateSet()
+     */
+    BaseColorCoordinateSet,
+
+    /**
+     * Metalness for PBR metallic/roughness materials,
+     * @ref MaterialAttributeType::Float.
+     *
+     * If @ref MaterialAttribute::MetalnessTexture or
+     * @ref MaterialAttribute::MetallicRoughnessTexture is present as well,
+     * these two are multiplied together.
+     * @see @ref PbrMetallicRoughnessMaterialData::metalness()
+     */
+    Metalness,
+
+    /**
+     * Metalness texture index for PBR metallic/roughness materials,
+     * @ref MaterialAttributeType::UnsignedInt.
+     *
+     * If @ref MaterialAttribute::Metalness is present as well, these two are
+     * multiplied together. Can be alternatively supplied as a packed
+     * @ref MaterialAttribute::MetallicRoughnessTexture.
+     * @see @ref PbrMetallicRoughnessMaterialData::hasMetalnessTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasMetallicRoughnessTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasOcclusionRoughnessMetallicTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasNormalRoughnessMetallicTexture()
+     *      @ref PbrMetallicRoughnessMaterialData::metalnessTexture()
+     */
+    MetalnessTexture,
+
+    /**
+     * Metalness texture swizzle for PBR metallic/roughness materials,
+     * @ref MaterialAttributeType::TextureSwizzle.
+     *
+     * Can be used to express arbitrary packing of
+     * @ref MaterialAttribute::MetalnessTexture together with other maps in a
+     * single texture. A single-channel swizzle value is expected. If not
+     * present, @ref MaterialTextureSwizzle::R is assumed.
+     * @see @ref PbrMetallicRoughnessMaterialData::hasMetallicRoughnessTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasOcclusionRoughnessMetallicTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasNormalRoughnessMetallicTexture()
+     *      @ref PbrMetallicRoughnessMaterialData::metalnessTextureSwizzle()
+     */
+    MetalnessTextureSwizzle,
+
+    /**
+     * Metalness texture transformation matrix for PBR metallic/roughness
+     * materials, @ref MaterialAttributeType::Matrix3x3.
+     *
+     * Has a precedence over @ref MaterialAttribute::TextureMatrix if both are
+     * present.
+     * @see @ref PbrMetallicRoughnessMaterialData::metalnessTextureMatrix()
+     */
+    MetalnessTextureMatrix,
+
+    /**
+     * Metalness texture coordinate set index for PBR metallic/roughness
+     * materials, @ref MaterialAttributeType::UnsignedInt.
+     *
+     * Has a precedence over @ref MaterialAttribute::CoordinateSet if both are
+     * present.
+     * @see @ref PbrMetallicRoughnessMaterialData::metalnessCoordinateSet()
+     */
+    MetalnessCoordinateSet,
+
+    /**
+     * Roughness for PBR metallic/roughness materials,
+     * @ref MaterialAttributeType::Float.
+     *
+     * If @ref MaterialAttribute::RoughnessTexture or
+     * @ref MaterialAttribute::MetallicRoughnessTexture is present as well,
+     * these two are multiplied together.
+     * @see @ref PbrMetallicRoughnessMaterialData::roughness()
+     */
+    Roughness,
+
+    /**
+     * Roughness texture index for PBR metallic/roughness materials,
+     * @ref MaterialAttributeType::UnsignedInt.
+     *
+     * If @ref MaterialAttribute::Roughness is present as well, these two are
+     * multiplied together. Can be alternatively supplied as a packed
+     * @ref MaterialAttribute::MetallicRoughnessTexture.
+     * @see @ref PbrMetallicRoughnessMaterialData::hasRoughnessTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasMetallicRoughnessTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasOcclusionRoughnessMetallicTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasNormalRoughnessMetallicTexture()
+     *      @ref PbrMetallicRoughnessMaterialData::roughnessTexture()
+     */
+    RoughnessTexture,
+
+    /**
+     * Roughness texture swizzle for PBR metallic/roughness materials,
+     * @ref MaterialAttributeType::TextureSwizzle.
+     *
+     * Can be used to express arbitrary packing of
+     * @ref MaterialAttribute::RoughnessTexture together with other maps in a
+     * single texture. A single-channel swizzle value is expected. If not
+     * present, @ref MaterialTextureSwizzle::R is assumed.
+     * @see @ref PbrMetallicRoughnessMaterialData::hasMetallicRoughnessTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasOcclusionRoughnessMetallicTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasNormalRoughnessMetallicTexture()
+     *      @ref PbrMetallicRoughnessMaterialData::roughnessTextureSwizzle()
+     */
+    RoughnessTextureSwizzle,
+
+    /**
+     * Roughness texture transformation matrix for PBR metallic/roughness
+     * materials, @ref MaterialAttributeType::Matrix3x3.
+     *
+     * Has a precedence over @ref MaterialAttribute::TextureMatrix if both are
+     * present.
+     * @see @ref PbrMetallicRoughnessMaterialData::roughnessTextureMatrix()
+     */
+    RoughnessTextureMatrix,
+
+    /**
+     * Roughness texture coordinate set index for PBR metallic/roughness
+     * materials, @ref MaterialAttributeType::UnsignedInt.
+     *
+     * Has a precedence over @ref MaterialAttribute::CoordinateSet if both are
+     * present.
+     * @see @ref PbrMetallicRoughnessMaterialData::roughnessCoordinateSet()
+     */
+    RoughnessCoordinateSet,
+
+    /**
+     * Metallic/roughness texture index for PBR metallic/roughness materials,
+     * @ref MaterialAttributeType::UnsignedInt.
+     *
+     * If @ref MaterialAttribute::Metalness / @ref MaterialAttribute::Roughness
+     * is present as well, these two are multiplied together. Can be
+     * alternatively specified as a pair of @ref MaterialAttribute::MetalnessTexture
+     * / @ref MaterialAttribute::RoughnessTexture attributes together with
+     * @ref MaterialAttribute::MetalnessTextureSwizzle set to
+     * @ref MaterialTextureSwizzle::R (or omitted, since that's the default)
+     * and @ref MaterialAttribute::RoughnessTextureSwizzle set to
+     * @ref MaterialTextureSwizzle::G.
+     * @see @ref PbrMetallicRoughnessMaterialData::hasMetallicRoughnessTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasOcclusionRoughnessMetallicTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasNormalRoughnessMetallicTexture()
+     *      @ref PbrMetallicRoughnessMaterialData::metalnessTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::roughnessTexture()
+     */
+    MetallicRoughnessTexture,
+
+    /**
+     * Metallic/roughness texture transformation matrix for PBR
+     * metallic/roughness materials, @ref MaterialAttributeType::Matrix3x3.
+     *
+     * Has a precedence over @ref MaterialAttribute::TextureMatrix if both are
+     * present. Can be alternatively specified as a pair of
+     * @ref MaterialAttribute::MetalnessTextureMatrix /
+     * @ref MaterialAttribute::RoughnessTextureMatrix attributes.
+     * @see @ref PbrMetallicRoughnessMaterialData::hasMetallicRoughnessTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasOcclusionRoughnessMetallicTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasNormalRoughnessMetallicTexture()
+     *      @ref PbrMetallicRoughnessMaterialData::metalnessTextureMatrix(),
+     *      @ref PbrMetallicRoughnessMaterialData::roughnessTextureMatrix()
+     */
+    MetallicRoughnessTextureMatrix,
+
+    /**
+     * Metallic/roughness texture coordinate set index for PBR
+     * metallic/roughness materials, @ref MaterialAttributeType::UnsignedInt.
+     *
+     * Has a precedence over @ref MaterialAttribute::CoordinateSet if both are
+     * present. Can be alternatively specified as a pair of
+     * @ref MaterialAttribute::MetalnessCoordinateSet /
+     * @ref MaterialAttribute::RoughnessCoordinateSet attributes.
+     * @see @ref PbrMetallicRoughnessMaterialData::hasMetallicRoughnessTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasOcclusionRoughnessMetallicTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasNormalRoughnessMetallicTexture()
+     *      @ref PbrMetallicRoughnessMaterialData::metalnessCoordinateSet(),
+     *      @ref PbrMetallicRoughnessMaterialData::roughnessCoordinateSet()
+     */
+    MetallicRoughnessCoordinateSet,
+
+    /* DiffuseColor, DiffuseTexture, DiffuseTextureMatrix,
+       DiffuseCoordinateSet, SpecularColor, SpecularTexture,
+       SpecularTextureMatrix specified above for Phong already */
+
+    /**
+     * Glossiness for PBR specular/glossiness materials,
+     * @ref MaterialAttributeType::Float.
+     *
+     * If @ref MaterialAttribute::GlossinessTexture or
+     * @ref MaterialAttribute::SpecularGlossinessTexture is present as well,
+     * these two are multiplied together.
+     * @see @ref PbrSpecularGlossinessMaterialData::glossiness()
+     */
+    Glossiness,
+
+    /**
+     * Glossiness texture index for PBR specular/glossiness materials,
+     * @ref MaterialAttributeType::UnsignedInt.
+     *
+     * If @ref MaterialAttribute::Glossiness is present as well, these two are
+     * multiplied together. Can be alternatively supplied as a packed
+     * @ref MaterialAttribute::SpecularGlossinessTexture.
+     * @see @ref PbrSpecularGlossinessMaterialData::hasGlossinessTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::hasSpecularGlossinessTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::glossinessTexture()
+     */
+    GlossinessTexture,
+
+    /**
+     * Glossiness texture swizzle for PBR specular/glossiness materials,
+     * @ref MaterialAttributeType::TextureSwizzle.
+     *
+     * Can be used to express arbitrary packing of
+     * @ref MaterialAttribute::GlossinessTexture together with other maps in a
+     * single texture. A single-channel swizzle value is expected. If not
+     * present, @ref MaterialTextureSwizzle::R is assumed.
+     * @see @ref PbrSpecularGlossinessMaterialData::hasSpecularGlossinessTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::glossinessTextureSwizzle()
+     */
+    GlossinessTextureSwizzle,
+
+    /**
+     * Glossiness texture transformation matrix for PBR specular/glossiness
+     * materials, @ref MaterialAttributeType::Matrix3x3.
+     *
+     * Has a precedence over @ref MaterialAttribute::TextureMatrix if both are
+     * present.
+     * @see @ref PbrSpecularGlossinessMaterialData::glossinessTextureMatrix()
+     */
+    GlossinessTextureMatrix,
+
+    /**
+     * Glossiness texture coordinate set index for PBR specular/glossiness
+     * materials, @ref MaterialAttributeType::UnsignedInt.
+     *
+     * Has a precedence over @ref MaterialAttribute::CoordinateSet if both are
+     * present.
+     * @see @ref PbrSpecularGlossinessMaterialData::glossinessCoordinateSet()
+     */
+    GlossinessCoordinateSet,
+
+    /**
+     * Specular/glossiness texture index for PBR specular/glossiness materials,
+     * @ref MaterialAttributeType::UnsignedInt.
+     *
+     * If @ref MaterialAttribute::SpecularColor / @ref MaterialAttribute::Glossiness
+     * is present as well, these two are multiplied together. Can be
+     * alternatively specified as a pair of @ref MaterialAttribute::SpecularTexture
+     * / @ref MaterialAttribute::GlossinessTexture attributes together with
+     * @ref MaterialAttribute::GlossinessTextureSwizzle set to
+     * @ref MaterialTextureSwizzle::A.
+     * @see @ref PbrSpecularGlossinessMaterialData::hasSpecularGlossinessTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::specularTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::glossinessTexture()
+     */
+    SpecularGlossinessTexture,
+
+    /**
+     * Specular/glossiness texture transformation matrix for PBR
+     * specular/glossiness materials, @ref MaterialAttributeType::Matrix3x3.
+     *
+     * Has a precedence over @ref MaterialAttribute::TextureMatrix if both are
+     * present. Can be alternatively specified as a pair of
+     * @ref MaterialAttribute::SpecularTextureMatrix /
+     * @ref MaterialAttribute::GlossinessTextureMatrix attributes.
+     * @see @ref PbrSpecularGlossinessMaterialData::hasSpecularGlossinessTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::specularTextureMatrix(),
+     *      @ref PbrSpecularGlossinessMaterialData::glossinessTextureMatrix()
+     */
+    SpecularGlossinessTextureMatrix,
+
+    /**
+     * Specular/glossiness texture coordinate set index for PBR
+     * specular/glossiness materials, @ref MaterialAttributeType::UnsignedInt.
+     *
+     * Has a precedence over @ref MaterialAttribute::CoordinateSet if both are
+     * present. Can be alternatively specified as a pair of
+     * @ref MaterialAttribute::SpecularCoordinateSet /
+     * @ref MaterialAttribute::GlossinessCoordinateSet attributes.
+     * @see @ref PbrSpecularGlossinessMaterialData::hasSpecularGlossinessTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::specularCoordinateSet(),
+     *      @ref PbrSpecularGlossinessMaterialData::glossinessCoordinateSet()
+     */
+    SpecularGlossinessCoordinateSet,
+
+    /**
      * Tangent-space normal map texture index,
      * @ref MaterialAttributeType::UnsignedInt.
-     * @see @ref PhongMaterialData::normalTexture()
+     * @see @ref PhongMaterialData::normalTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasNormalTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasNormalRoughnessMetallicTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::normalTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::normalTexture()
      */
     NormalTexture,
+
+    /**
+     * Normal texture swizzle, @ref MaterialAttributeType::TextureSwizzle.
+     *
+     * Can be used to express arbitrary packing together with other maps in a
+     * single texture. A two- or three-channel swizzle value is expected. If
+     * not present, @ref MaterialTextureSwizzle::RGB is assumed.
+     * @see @ref PbrMetallicRoughnessMaterialData::hasNormalRoughnessMetallicTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::normalTextureSwizzle(),
+     *      @ref PbrSpecularGlossinessMaterialData::normalTextureSwizzle()
+     */
+    NormalTextureSwizzle,
 
     /**
      * Normal texture transformation matrix,
@@ -239,7 +592,9 @@ enum class MaterialAttribute: UnsignedInt {
      *
      * Has a precedence over @ref MaterialAttribute::TextureMatrix if both are
      * present.
-     * @see @ref PhongMaterialData::normalTextureMatrix()
+     * @see @ref PhongMaterialData::normalTextureMatrix(),
+     *      @ref PbrMetallicRoughnessMaterialData::normalTextureMatrix(),
+     *      @ref PbrSpecularGlossinessMaterialData::normalTextureMatrix()
      */
     NormalTextureMatrix,
 
@@ -249,9 +604,103 @@ enum class MaterialAttribute: UnsignedInt {
      *
      * Has a precedence over @ref MaterialAttribute::CoordinateSet if both are
      * present.
-     * @see @ref PhongMaterialData::normalCoordinateSet()
+     * @see @ref PhongMaterialData::normalCoordinateSet(),
+     *      @ref PbrMetallicRoughnessMaterialData::normalCoordinateSet(),
+     *      @ref PbrSpecularGlossinessMaterialData::normalCoordinateSet()
      */
     NormalCoordinateSet,
+
+    /**
+     * Occlusion texture index,
+     * @ref MaterialAttributeType::UnsignedInt.
+     * @see @ref PbrMetallicRoughnessMaterialData::hasOcclusionTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::hasOcclusionRoughnessMetallicTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::occlusionTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::hasOcclusionTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::occlusionTexture()
+     */
+    OcclusionTexture,
+
+    /**
+     * Occlusion texture swizzle, @ref MaterialAttributeType::TextureSwizzle.
+     *
+     * Can be used to express arbitrary packing together with other maps in a
+     * single texture. A single-channel swizzle value is expected. If
+     * not present, @ref MaterialTextureSwizzle::R is assumed.
+     * @see @ref PbrMetallicRoughnessMaterialData::hasOcclusionRoughnessMetallicTexture(),
+     *      @ref PbrMetallicRoughnessMaterialData::occlusionTextureSwizzle(),
+     *      @ref PbrSpecularGlossinessMaterialData::occlusionTextureSwizzle()
+     */
+    OcclusionTextureSwizzle,
+
+    /**
+     * Occlusion texture transformation matrix,
+     * @ref MaterialAttributeType::Matrix3x3.
+     *
+     * Has a precedence over @ref MaterialAttribute::TextureMatrix if both are
+     * present.
+     * @see @ref PbrMetallicRoughnessMaterialData::occlusionTextureMatrix(),
+     *      @ref PbrSpecularGlossinessMaterialData::occlusionTextureSwizzle()
+     */
+    OcclusionTextureMatrix,
+
+    /**
+     * Occlusion texture coordinate set index,
+     * @ref MaterialAttributeType::UnsignedInt.
+     *
+     * Has a precedence over @ref MaterialAttribute::CoordinateSet if both are
+     * present.
+     * @see @ref PbrMetallicRoughnessMaterialData::occlusionCoordinateSet(),
+     *      @ref PbrSpecularGlossinessMaterialData::occlusionCoordinateSet()
+     */
+    OcclusionCoordinateSet,
+
+    /**
+     * Emissive color,
+     * @ref MaterialAttributeType::Vector3.
+     *
+     * If @ref MaterialAttribute::EmissiveTexture is present as well, these two
+     * are multiplied together.
+     * @see @ref PbrMetallicRoughnessMaterialData::emissiveColor(),
+     *      @ref PbrSpecularGlossinessMaterialData::emissiveColor()
+     */
+    EmissiveColor,
+
+    /**
+     * Emissive texture index,
+     * @ref MaterialAttributeType::UnsignedInt.
+     *
+     * If @ref MaterialAttribute::EmissiveColor is present as well, these two
+     * are multiplied together.
+     * @see @ref PbrMetallicRoughnessMaterialData::emissiveTexture(),
+     *      @ref PbrSpecularGlossinessMaterialData::emissiveTexture()
+     */
+    EmissiveTexture,
+
+    /** @todo EmissiveTextureSwizzle? It's a color and I'm not aware of any
+        existing packing schemes, so probably safe to assume it's always RGB */
+
+    /**
+     * Emissive texture transformation matrix,
+     * @ref MaterialAttributeType::Matrix3x3.
+     *
+     * Has a precedence over @ref MaterialAttribute::TextureMatrix if both are
+     * present.
+     * @see @ref PbrMetallicRoughnessMaterialData::emissiveTextureMatrix(),
+     *      @ref PbrSpecularGlossinessMaterialData::emissiveTextureMatrix(),
+     */
+    EmissiveTextureMatrix,
+
+    /**
+     * Emissive texture coordinate set index,
+     * @ref MaterialAttributeType::UnsignedInt.
+     *
+     * Has a precedence over @ref MaterialAttribute::CoordinateSet if both are
+     * present.
+     * @see @ref PbrMetallicRoughnessMaterialData::emissiveCoordinateSet(),
+     *      @ref PbrSpecularGlossinessMaterialData::emissiveCoordinateSet()
+     */
+    EmissiveCoordinateSet,
 
     /**
      * Common texture transformation matrix for all textures,
@@ -260,9 +709,18 @@ enum class MaterialAttribute: UnsignedInt {
      * @ref MaterialAttribute::AmbientTextureMatrix /
      * @ref MaterialAttribute::DiffuseTextureMatrix /
      * @ref MaterialAttribute::SpecularTextureMatrix /
-     * @ref MaterialAttribute::NormalTextureMatrix have a precedence over this
-     * attribute for given texture, if present.
-     * @see @ref PhongMaterialData::textureMatrix()
+     * @ref MaterialAttribute::MetalnessTextureMatrix /
+     * @ref MaterialAttribute::RoughnessTextureMatrix /
+     * @ref MaterialAttribute::MetallicRoughnessTextureMatrix /
+     * @ref MaterialAttribute::GlossinessTextureMatrix /
+     * @ref MaterialAttribute::SpecularGlossinessTextureMatrix /
+     * @ref MaterialAttribute::NormalTextureMatrix /
+     * @ref MaterialAttribute::OcclusionTextureMatrix /
+     * @ref MaterialAttribute::EmissiveTextureMatrix have a precedence over
+     * this attribute for given texture, if present.
+     * @see @ref PhongMaterialData::textureMatrix(),
+     *      @ref PbrMetallicRoughnessMaterialData::textureMatrix(),
+     *      @ref PbrSpecularGlossinessMaterialData::textureMatrix()
      */
     TextureMatrix,
 
@@ -273,9 +731,18 @@ enum class MaterialAttribute: UnsignedInt {
      * @ref MaterialAttribute::AmbientCoordinateSet /
      * @ref MaterialAttribute::DiffuseCoordinateSet /
      * @ref MaterialAttribute::SpecularCoordinateSet /
-     * @ref MaterialAttribute::NormalCoordinateSet have a precedence over this
-     * attribute for given texture, if present.
-     * @see @ref PhongMaterialData::coordinateSet()
+     * @ref MaterialAttribute::MetalnessCoordinateSet /
+     * @ref MaterialAttribute::RoughnessCoordinateSet /
+     * @ref MaterialAttribute::MetallicRoughnessCoordinateSet /
+     * @ref MaterialAttribute::GlossinessCoordinateSet /
+     * @ref MaterialAttribute::SpecularGlossinessCoordinateSet /
+     * @ref MaterialAttribute::NormalCoordinateSet /
+     * @ref MaterialAttribute::OcclusionCoordinateSet /
+     * @ref MaterialAttribute::EmissiveCoordinateSet have a precedence over
+     * this attribute for given texture, if present.
+     * @see @ref PhongMaterialData::coordinateSet(),
+     *      @ref PbrMetallicRoughnessMaterialData::coordinateSet(),
+     *      @ref PbrSpecularGlossinessMaterialData::coordinateSet()
      */
     CoordinateSet,
 };
@@ -665,7 +1132,19 @@ enum class MaterialType: UnsignedInt {
     /**
      * Phong. Use @ref PhongMaterialData for convenience attribute access.
      */
-    Phong = 1 << 0
+    Phong = 1 << 0,
+
+    /**
+     * PBR metallic/roughness. Use @ref PbrMetallicRoughnessMaterialData for
+     * convenience attribute access.
+     */
+    PbrMetallicRoughness = 1 << 1,
+
+    /**
+     * PBR specular/glossiness. Use @ref PbrSpecularGlossinessMaterialData for
+     * convenience attribute access.
+     */
+    PbrSpecularGlossiness = 1 << 2
 };
 
 /** @debugoperatorenum{MaterialType} */
